@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Treblle ROI Calculator</title>
+<style>
+  :root{
+    --bg:#070c16;
+    --surface:#0b1220;
+    --panel:#0f1726;
+    --muted:#8aa0be;
+    --text:#e6eefc;
+    --primary:#5ac8fa;
+    --accent:#7ee2ff;
+    --good:#16c784;
+    --warn:#f59e0b;
+    --bad:#ef4444;
+    --border:rgba(130,150,180,.25);
+    --ring: rgba(122, 229, 255, .45);
+    --glass: rgba(255,255,255,.04);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 800px at 75% -10%, rgba(90,200,250,.25), transparent 60%),
+      radial-gradient(1200px 800px at -10% 110%, rgba(110,231,255,.18), transparent 60%),
+      linear-gradient(180deg, #060b13, #0a0f1a 35%, #060b13);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+    line-height:1.45;
+  }
+  .wrap{max-width:1220px;margin:28px auto 88px;padding:0 18px}
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:18px}
+  header h1{margin:0;font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:.2px}
+  header .sub{margin:0;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+  @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+  .card{
+    background: linear-gradient(180deg, var(--glass), transparent);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+    position:relative;
+    overflow:clip;
+  }
+  .card:before{content:"";position:absolute; inset:-1px;border-radius:18px;background: radial-gradient(600px 120px at 20% -40px, var(--ring), transparent 60%);pointer-events:none;opacity:.5}
+  .card h2{margin:0 0 8px;font-size:clamp(16px,2.1vw,20px)}
+  .section{margin:10px 0 4px;padding-top:8px;border-top:1px dashed var(--border);color:#cbd5e1;font-weight:700;text-transform:uppercase;letter-spacing:.6px;font-size:12px}
+  .row{display:grid;grid-template-columns:1.3fr .7fr .7fr;gap:10px;padding:6px 0;align-items:center}
+  .row label{color:#cbd5e1;font-size:13px}
+  .row input,.row select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:#0b1424;color:var(--text);outline:none;transition:border .15s, box-shadow .15s}
+  .row input:focus,.row select:focus{box-shadow:0 0 0 3px var(--ring);border-color:transparent}
+  .row input[type=number]{text-align:right}
+  .hint{color:var(--muted);font-size:12px}
+  .stack{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{border:1px solid var(--border);background:#0b1424;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer}
+  .btn.primary{background:linear-gradient(180deg, var(--primary), var(--accent));color:#051320;font-weight:800;border:none}
+  .summary{display:grid;grid-template-columns: repeat(2, minmax(0,1fr));gap:14px}
+  .kpi{background:#091325;border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:2px}
+  .kpi h3{margin:0;color:#cbd5e1;font-size:13px}
+  .kpi .val{font-size:clamp(20px,3.3vw,30px);font-weight:900}
+  .kpi .trend{font-size:12px;color:var(--muted)}
+  .mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .badge{font-size:12px;padding:6px 8px;border-radius:999px;border:1px solid var(--border);background:#0a1322;color:#cfe6ff}
+  .impact{display:grid;grid-template-columns:1fr;gap:10px;margin-top:8px}
+  .impactCard{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;background:linear-gradient(180deg,rgba(135,207,255,.06),rgba(255,255,255,.02));border:1px solid var(--border);border-radius:16px;padding:12px 14px}
+  .icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(220px 90px at 120% -10%, rgba(90,200,250,.25), transparent 60%),#0a1422;border:1px solid var(--border)}
+  .icon svg{width:24px;height:24px;opacity:.9}
+  .impTitle{font-weight:700}
+  .beforeAfter{font-size:12px;color:var(--muted)}
+  .deltaPct{font-weight:900;color:var(--good);font-size:clamp(16px,2.4vw,22px);text-align:right}
+  .deltaMoney{font-size:12px;color:#9cc2ff;text-align:right}
+  .bar{position:relative;height:8px;background:#081122;border-radius:999px;overflow:hidden;margin-top:7px}
+  .bar>span{position:absolute;inset:0 100% 0 0;background:linear-gradient(90deg, var(--primary), var(--accent))}
+  .drivers{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:10px;margin-top:10px}
+  @media (max-width:520px){.drivers{grid-template-columns:1fr}}
+  .driver{background:#091325;border:1px solid var(--border);border-radius:14px;padding:12px}
+  .driver .name{color:#cbd5e1;font-size:12px;margin-bottom:4px}
+  .driver .amt{font-weight:800}
+  /* small disclaimer style */
+  .disclaimer{margin-top:6px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Treblle Enterprise: ROI Estimator</h1>
+    <p class="sub">Estimate your API time-savings, net value, ROI multiple, and payback - based on your inputs.</p>
+    <div class="disclaimer">This tool provides operational efficiency estimates only. Results depend on your inputs and model assumptions; actual outcomes may vary.</div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Inputs</h2>
+      <div class="badges">
+        <div class="badge">Conservative adjustment applied to benefits</div>
+        <div class="badge">SaaS $2,999/mo · Private $5,998/mo</div>
+        <div class="badge">Base includes 25 Production APIs</div>
+      </div>
+
+      <div class="section">Company & Traffic</div>
+      <div class="row"><label>Company name</label><input id="company" placeholder="Optional" /><div></div></div>
+      <div class="row"><label>Annual API requests</label><input id="annualRequests" type="number" value="300000000" class="mono"/><div class="hint">For context only</div></div>
+      <div class="row"><label>Monthly API growth (%)</label><input id="monthlyGrowth" type="number" value="10" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label>Production APIs (count)</label><input id="numAPIs" type="number" value="25" min="1" step="1" class="mono"/><div class="hint">Base includes 25</div></div>
+      <div class="row"><label>API consumers / partners (count)</label><input id="numConsumers" type="number" value="1000" min="0" step="1" class="mono"/><div></div></div>
+
+      <div class="section">Support & Engineering Baseline</div>
+      <div class="row"><label>Support tickets per month (all)</label><input id="ticketsPerMonth" type="number" value="200" class="mono"/><div></div></div>
+      <div class="row"><label>% of tickets that are API-related</label><input id="pctApiTickets" type="number" value="70" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label>% of API tickets escalated to engineering</label><input id="pctEscalated" type="number" value="30" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label>Avg Support time per API ticket (hours)</label><input id="hrsSupportPerTicket" type="number" value="0.5" step="0.01" class="mono"/><div></div></div>
+      <div class="row"><label>Avg Engineering time per escalated ticket (hours)</label><input id="hrsEngPerEscalation" type="number" value="1.0" step="0.01" class="mono"/><div></div></div>
+      <div class="row"><label>Hourly loaded cost - Support ($)</label><input id="rateSupport" type="number" value="45" class="mono"/><div></div></div>
+      <div class="row"><label>Hourly loaded cost - Engineering ($)</label><input id="rateEng" type="number" value="85" class="mono"/><div></div></div>
+
+      <div class="section">Analysis & Governance</div>
+      <div class="row"><label>Weekly hours on customer pattern analysis (team total)</label><input id="weeklyPatternHours" type="number" value="20" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label>Hourly loaded cost - Analytics/PM ($)</label><input id="rateAnalytics" type="number" value="70" class="mono"/><div></div></div>
+      <div class="row"><label>Gateway/SQL manual query hours per month</label><input id="azureHours" type="number" value="40" step="0.1" class="mono"/><div></div></div>
+
+      <div class="section">Customer & Revenue</div>
+      <div class="row"><label>Customers / partners (count)</label><input id="customers" type="number" value="2000" class="mono"/><div></div></div>
+      <div class="row"><label>Average customer annual value ($)</label><input id="arpa" type="number" value="1500" class="mono"/><div></div></div>
+      <div class="row"><label>Retention risk due to analytics gap (%)</label><input id="retentionRisk" type="number" value="1.0" step="0.1" class="mono"/><div></div></div>
+
+      <div class="section">Compliance & Alternative Tooling</div>
+      <div class="row"><label>Compliance FTEs avoided (count)</label><input id="complianceFTE" type="number" value="0" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label>FTE fully loaded cost ($/year)</label><input id="fteCost" type="number" value="120000" class="mono"/><div></div></div>
+      <div class="row"><label>Alternative monitoring/tooling cost avoided ($/year)</label><input id="altTooling" type="number" value="0" class="mono"/><div></div></div>
+      <div class="row"><label>Developer portal license savings ($/year)</label><input id="devPortalSavings" type="number" value="0" class="mono"/><div></div></div>
+
+      <div class="section">Assumptions & Deployment</div>
+      <div class="row"><label>Conservatism factor (%)</label><input id="confidence" type="number" value="80" step="1" class="mono"/><div class="hint">Applies a discount to benefits</div></div>
+      <div class="row"><label>Deployment</label>
+        <select id="deployment"><option value="SaaS" selected>SaaS</option><option value="Private">Private</option></select>
+        <div class="hint">Override value bypasses estimator</div>
+      </div>
+      <div class="row"><label>Treblle annual cost (override)</label><input id="override" type="number" placeholder="Leave blank to auto-estimate" class="mono"/><div></div></div>
+      <div class="row"><label>Customer communication per ticket (hours)</label><input id="commsHoursPerTicket" type="number" value="0.25" step="0.01" class="mono"/><div></div></div>
+      <div class="row"><label>Currency</label>
+        <select id="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>SEK</option><option>NOK</option></select>
+        <div></div>
+      </div>
+
+      <div class="stack" style="margin-top:10px">
+        <button class="btn" id="resetBtn">Reset defaults</button>
+        <button class="btn primary" id="recalcBtn">Calculate</button>
+      </div>
+
+      <details style="margin-top:12px">
+        <summary>Model assumptions &amp; pricing (optional)</summary>
+        <div class="section">Benchmarks</div>
+        <div class="row"><label>Support time reduction per API ticket (%)</label><input id="bmSupport" type="number" value="68.7" step="0.1" class="mono"/><div></div></div>
+        <div class="row"><label>Engineering time reduction per escalated ticket (%)</label><input id="bmEng" type="number" value="86.9" step="0.1" class="mono"/><div></div></div>
+        <div class="row"><label>Customer comms overhead reduction (%)</label><input id="bmComms" type="number" value="94.2" step="0.1" class="mono"/><div></div></div>
+        <div class="row"><label>Gateway/SQL manual query time reduction (%)</label><input id="bmAzure" type="number" value="90.0" step="0.1" class="mono"/><div></div></div>
+
+        <div class="section">Pricing (auto-estimate when override is blank)</div>
+        <div class="row"><label>SaaS base ($/yr)</label><input id="pSaaSBase" type="number" value="35988" class="mono"/><div class="hint">$2,999/mo</div></div>
+        <div class="row"><label>SaaS add-on pack 25 APIs (annual)</label><input id="pSaaS25" type="number" value="10800" class="mono"/><div class="hint">+1B req</div></div>
+        <div class="row"><label>Private Cloud base ($/yr)</label><input id="pPrivBase" type="number" value="71976" class="mono"/><div class="hint">$5,998/mo</div></div>
+        <div class="row"><label>Private Cloud per-API (beyond 25) ($/yr)</label><input id="pPrivPerAPI" type="number" value="360" class="mono"/><div class="hint">$30/API/mo</div></div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>Results</h2>
+
+      <div class="summary">
+        <div class="kpi">
+          <h3>Gross benefit (conservatism applied)</h3>
+          <div class="val mono" id="outBenefit">$0</div>
+          <div class="trend" id="hoursSaved">Annual hours saved: 0</div>
+        </div>
+        <div class="kpi">
+          <h3>Estimated Treblle cost</h3>
+          <div class="val mono" id="outCost">$0</div>
+          <div class="trend" id="deploymentNote">SaaS estimator</div>
+        </div>
+        <div class="kpi">
+          <h3>Net annual value</h3>
+          <div class="val mono" id="outNet">$0</div>
+          <div class="trend">Conservatism: <span id="outConf">80%</span></div>
+        </div>
+        <div class="kpi">
+          <h3>ROI multiple (x)</h3>
+          <div class="val mono" id="outROI">n/a</div>
+          <div class="trend">Based on conservatively adjusted benefit</div>
+        </div>
+        <div class="kpi">
+          <h3>Payback period (months)</h3>
+          <div class="val mono" id="outPaybackKPI">n/a</div>
+          <div class="trend">12 × cost / benefit</div>
+        </div>
+      </div>
+
+      <div class="section">Areas of Improvement</div>
+      <div class="impact" id="areas"></div>
+
+      <div class="section">Top Drivers by $ Impact</div>
+      <div class="drivers" id="drivers"></div>
+
+      <div class="disclaimer">These outputs are estimates based on user-provided inputs and model assumptions.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const sym = c => ({USD:"$",EUR:"€",GBP:"£",SEK:"kr",NOK:"kr"}[c]||"");
+  const money = (v,c) => (Number.isFinite(v)? sym(c)+Number(v).toLocaleString(undefined,{maximumFractionDigits:0}) : "n/a");
+  const num = v => (Number.isFinite(v)? Number(v).toLocaleString(): "n/a");
+
+  const defaults = () => ({
+    annualRequests:300000000, monthlyGrowth:10, numAPIs:25, numConsumers:1000,
+    ticketsPerMonth:200, pctApiTickets:70, pctEscalated:30,
+    hrsSupportPerTicket:0.5, hrsEngPerEscalation:1.0,
+    rateSupport:45, rateEng:85,
+    weeklyPatternHours:20, rateAnalytics:70, azureHours:40,
+    customers:2000, arpa:1500, retentionRisk:1.0,
+    complianceFTE:0, fteCost:120000, altTooling:0, devPortalSavings:0,
+    confidence:80, deployment:"SaaS", override:"",
+    commsHoursPerTicket:0.25, currency:"USD",
+    bmSupport:68.7, bmEng:86.9, bmComms:94.2, bmAzure:90.0,
+    pSaaSBase:35988, pSaaS25:10800, pPrivBase:71976, pPrivPerAPI:360
+  });
+
+  function read(){
+    const val = id => {const el=$(id); if(!el) return 0; if(el.type==="number") return +el.value||0; return el.value;};
+    return {
+      company: $('company').value.trim(),
+      annualRequests: val('annualRequests'),
+      monthlyGrowth: val('monthlyGrowth'),
+      numAPIs: val('numAPIs'),
+      numConsumers: val('numConsumers'),
+      ticketsPerMonth: val('ticketsPerMonth'),
+      pctApiTickets: val('pctApiTickets'),
+      pctEscalated: val('pctEscalated'),
+      hrsSupportPerTicket: val('hrsSupportPerTicket'),
+      hrsEngPerEscalation: val('hrsEngPerEscalation'),
+      rateSupport: val('rateSupport'),
+      rateEng: val('rateEng'),
+      weeklyPatternHours: val('weeklyPatternHours'),
+      rateAnalytics: val('rateAnalytics'),
+      azureHours: val('azureHours'),
+      customers: val('customers'),
+      arpa: val('arpa'),
+      retentionRisk: val('retentionRisk'),
+      complianceFTE: val('complianceFTE'),
+      fteCost: val('fteCost'),
+      altTooling: val('altTooling'),
+      devPortalSavings: val('devPortalSavings'),
+      confidence: val('confidence'),
+      deployment: $('deployment').value,
+      override: (function(){const x=$('override').value.trim(); return x === "" ? "" : (+x || 0)})(),
+      commsHoursPerTicket: val('commsHoursPerTicket'),
+      currency: $('currency').value,
+      bmSupport: val('bmSupport'),
+      bmEng: val('bmEng'),
+      bmComms: val('bmComms'),
+      bmAzure: val('bmAzure'),
+      pSaaSBase: val('pSaaSBase'),
+      pSaaS25: val('pSaaS25'),
+      pPrivBase: val('pPrivBase'),
+      pPrivPerAPI: val('pPrivPerAPI')
+    };
+  }
+
+  function calc(){
+    const v = read();
+
+    const apiTicketsMo = v.ticketsPerMonth * (v.pctApiTickets/100);
+    const escalationsMo = apiTicketsMo * (v.pctEscalated/100);
+    const annualSupportHrs = apiTicketsMo * v.hrsSupportPerTicket * 12;
+    const annualEngHrs     = escalationsMo * v.hrsEngPerEscalation * 12;
+
+    // After values for “areas”
+    const supAfter = v.hrsSupportPerTicket * (1 - v.bmSupport/100);
+    const engAfter = v.hrsEngPerEscalation * (1 - v.bmEng/100);
+    const commsBefore = v.commsHoursPerTicket;
+    const commsAfter  = v.commsHoursPerTicket * (v.bmComms>99.9 ? 0 : (1 - v.bmComms/100));
+    const azureMonthlyAfter = v.azureHours * (v.bmAzure>99.9 ? 0 : (1 - v.bmAzure/100));
+    const patternWeeklyAfter = 0; // fully reclaimed per model
+
+    // Savings (annualized)
+    const supportHrsSaved = annualSupportHrs * (v.bmSupport/100);
+    const engHrsSaved     = annualEngHrs * (v.bmEng/100);
+    const supportSavings  = supportHrsSaved * v.rateSupport;
+    const engSavings      = engHrsSaved * v.rateEng;
+
+    const commsHoursSaved = apiTicketsMo * v.commsHoursPerTicket * 12 * (v.bmComms/100);
+    const commsSavings    = commsHoursSaved * v.rateSupport;
+
+    const azureHoursSaved = v.azureHours * 12 * (v.bmAzure/100);
+    const azureSavings    = azureHoursSaved * v.rateEng;
+
+    const patternHoursSaved = v.weeklyPatternHours * 52;
+    const patternSavings    = patternHoursSaved * v.rateAnalytics;
+
+    const retentionSavings  = (v.retentionRisk/100) * v.customers * v.arpa;
+    const complianceAvoid   = v.complianceFTE * v.fteCost;
+    const altToolingAvoid   = v.altTooling;
+    const devPortalSave     = v.devPortalSavings;
+
+    const subtotal = supportSavings + engSavings + commsSavings + azureSavings + patternSavings + retentionSavings + complianceAvoid + altToolingAvoid + devPortalSave;
+    const benefit = subtotal * (v.confidence/100);
+
+    // Cost (override-first)
+    let estCost = 0;
+    let costNote = "";
+    if (v.override !== "" && v.override > 0){
+      estCost = v.override; costNote = "Override";
+    } else if (v.deployment === "SaaS"){
+      const base = v.pSaaSBase;
+      const extraAPIs = Math.max(0, v.numAPIs - 25);
+      const packs25 = extraAPIs === 0 ? 0 : Math.ceil(extraAPIs/25);
+      estCost = base + packs25 * v.pSaaS25; costNote = `SaaS: base + ${packs25}×25-pack`;
+    } else {
+      const base = v.pPrivBase;
+      const overAPIs = Math.max(0, v.numAPIs - 25);
+      estCost = base + overAPIs * v.pPrivPerAPI; costNote = `Private: base + ${overAPIs} over-APIs`;
+    }
+
+    const net = benefit - estCost;
+    const roi = estCost > 0 ? (net / estCost) : NaN;
+    const paybackMonths = benefit > 0 ? (12 * estCost / benefit) : NaN;
+
+    // KPIs
+    $('outBenefit').textContent = money(benefit, v.currency);
+    $('outCost').textContent    = money(estCost, v.currency);
+    $('outNet').textContent     = money(net, v.currency);
+    $('outROI').textContent     = (Number.isFinite(roi) ? roi.toFixed(2)+"x" : "n/a");
+    $('outPaybackKPI').textContent = (Number.isFinite(paybackMonths) ? paybackMonths.toFixed(1) : "n/a");
+    $('outConf').textContent    = Math.round(v.confidence) + "%";
+    $('deploymentNote').textContent = costNote;
+    const totalHoursSaved = supportHrsSaved + engHrsSaved + commsHoursSaved + azureHoursSaved + patternHoursSaved;
+    $('hoursSaved').textContent = "Annual hours saved: " + num(Math.round(totalHoursSaved));
+
+    // Areas of Improvement cards
+    const areas = [
+      {key:"support", title:"Support time per API ticket", before:v.hrsSupportPerTicket, after:supAfter, unit:"hrs", savings:supportSavings},
+      {key:"eng", title:"Engineering time per escalated ticket", before:v.hrsEngPerEscalation, after:engAfter, unit:"hrs", savings:engSavings},
+      {key:"comms", title:"Customer comms overhead per ticket", before:commsBefore, after:commsAfter, unit:"hrs", savings:commsSavings},
+      {key:"azure", title:"Gateway/SQL manual query time (monthly)", before:v.azureHours, after:azureMonthlyAfter, unit:"hrs", savings:azureSavings},
+      {key:"pattern", title:"Weekly pattern-analysis effort", before:v.weeklyPatternHours, after:patternWeeklyAfter, unit:"hrs", savings:patternSavings}
+    ];
+    const iconsMap = {
+      support:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M6 8a6 6 0 1112 0v3a2 2 0 012 2v4a2 2 0 01-2 2h-2v-7h2V8a8 8 0 10-16 0v3h2v7H6a2 2 0 01-2-2v-4a2 2 0 012-2V8z'/></svg>`,
+      eng:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M9.75 6.75l4.5 4.5-4.5 4.5M4.5 6.75h5.25M14.25 17.25H19.5'/></svg>`,
+      comms:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M21 15a3 3 0 01-3 3H8l-5 3V6a3 3 0 013-3h12a3 3 0 013 3v9z'/></svg>`,
+      azure:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><circle cx='12' cy='12' r='8'/><path d='M12 6v6l3 3'/></svg>`,
+      pattern:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M4 17l6-6 4 4 6-6'/><path d='M16 5h4v4'/></svg>`
+    };
+    const areasEl = $('areas'); areasEl.innerHTML = "";
+    areas.forEach(a=>{
+      const r = a.before>0 ? 1-(a.after/a.before) : 0;
+      const pctTxt = (r*100).toFixed(1)+"%";
+      const el = document.createElement('div');
+      el.className = "impactCard";
+      el.innerHTML = `
+        <div class="icon">${iconsMap[a.key]}</div>
+        <div>
+          <div class="impTitle">${a.title}</div>
+          <div class="beforeAfter mono">${a.before.toFixed(2)} ${a.unit} → ${a.after.toFixed(2)} ${a.unit}</div>
+          <div class="bar"><span style="width:${Math.max(0, Math.min(100, (r*100)))}%"></span></div>
+        </div>
+        <div>
+          <div class="deltaPct">-${pctTxt}</div>
+          <div class="deltaMoney mono">${money(a.savings, v.currency)} /yr</div>
+        </div>`;
+      areasEl.appendChild(el);
+    });
+
+    // Top drivers
+    const drivers = [
+      ["Support savings", supportSavings],
+      ["Engineering savings", engSavings],
+      ["Comms savings", commsSavings],
+      ["Gateway/SQL savings", azureSavings],
+      ["Pattern-analysis savings", patternSavings],
+      ["Retention savings", retentionSavings],
+      ["Compliance avoidance", complianceAvoid],
+      ["Alt tooling avoided", altToolingAvoid],
+      ["Dev portal savings", devPortalSave]
+    ].sort((a,b)=>b[1]-a[1]).slice(0,3);
+
+    const driversEl = $('drivers'); driversEl.innerHTML = "";
+    drivers.forEach(([name,val],i)=>{
+      const d = document.createElement('div');
+      d.className = "driver";
+      d.innerHTML = `<div class="name">#${i+1} ${name}</div><div class="amt mono">${money(val, v.currency)} /yr</div>`;
+      driversEl.appendChild(d);
+    });
+  }
+
+  function applyDefaults(){
+    const d = defaults();
+    for(const [k,v] of Object.entries(d)){
+      const el = document.getElementById(k);
+      if(!el) continue;
+      el.value = v;
+    }
+  }
+
+  $('recalcBtn').addEventListener('click', calc);
+  $('resetBtn').addEventListener('click', ()=>{ applyDefaults(); calc(); });
+  let t; document.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(calc,80); });
+  applyDefaults(); calc();
+})();
+</script>
+</body>
+</html>
+
