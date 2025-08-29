@@ -55,6 +55,7 @@
     --muted: #8aa0be;
     --text: var(--treblle-fog);
     --text-heading: var(--treblle-white);
+    --text-secondary: #D6E2FF;
     --primary: var(--treblle-primary);
     --accent: var(--treblle-electric-200);
     --good: var(--treblle-garden-200);
@@ -120,6 +121,7 @@
     .grid{gap:calc(var(--spacing-xl) * 1.5)}
     .stack{flex-direction:column}
     .btn{width:100%}
+    .kpi-subtext,.result-subtext,.kpi-caption,.currency-subtext{font-size:14px}
   }
   /* Card Primitive */
   .card{
@@ -167,8 +169,8 @@
   .kpi h3{margin:0;color:#cbd5e1;font-size:13px}
   .kpi .val{font-size:clamp(20px,3.3vw,30px);font-weight:900}
   .kpi .trend{font-size:12px;color:var(--muted)}
-  .kpi-subtext,.result-subtext{font-size:14px;color:var(--treblle-fog);opacity:.92}
-  .result-value,.kpi-value,.currency{text-align:right}
+  .kpi-subtext,.result-subtext,.kpi-caption,.currency-subtext{color:var(--text-secondary);font-size:clamp(13px,1.65vw,15px);line-height:1.35;letter-spacing:.1px;font-weight:500;opacity:1 !important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  .result-value,.kpi-value,.currency{text-align:right;font-variant-numeric:tabular-nums}
   .mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
   .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   .badge{font-size:12px;padding:6px 8px;border-radius:999px;border:1px solid var(--border);background:var(--treblle-obsidian);color:var(--treblle-fog)}
@@ -178,9 +180,9 @@
   .icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(220px 90px at 120% -10%, rgba(90,200,250,.25), transparent 60%),#0a1422;border:1px solid var(--treblle-element-300)}
   .icon svg{width:24px;height:24px;opacity:.9}
   .impTitle{font-weight:700;color:var(--treblle-fog)}
-  .beforeAfter{font-size:13px;color:var(--treblle-fog);opacity:0.8;font-weight:500}
+  .beforeAfter{font-size:14px;color:var(--text-secondary);opacity:1;font-weight:500;line-height:1.35;letter-spacing:.1px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
   .deltaPct{font-weight:900;color:var(--good);font-size:clamp(16px,2.4vw,22px);text-align:right}
-  .deltaMoney{font-size:13px;color:var(--treblle-electric-200);text-align:right;font-weight:600}
+  .deltaMoney{font-size:14px;color:var(--text-secondary);text-align:right;font-weight:500;line-height:1.35;letter-spacing:.1px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
   .bar{position:relative;height:8px;background:#081122;border-radius:999px;overflow:hidden;margin-top:7px}
   .bar>span{position:absolute;inset:0 100% 0 0;background:linear-gradient(90deg, var(--primary), var(--accent))}
   .drivers{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:10px;margin-top:10px}
