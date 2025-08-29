@@ -1,0 +1,7 @@
+@media (max-width: 480px) {
+  .row { grid-template-columns: 1fr !important; gap: 8px !important; }
+  .row .desc { font-size: 12px; opacity: .9; }
+}
+@media (max-width: 520px) {
+  .grid-2 { grid-template-columns: 1fr !important; }
+}

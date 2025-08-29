@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Treblle ROI Calculator</title>
+<title>Treblle ROI Estimator</title>
+<link rel="icon" type="image/png" href="assets/treblle-favicon.png">
+<meta name="description" content="Calculate your ROI with Treblle — see time and cost savings instantly.">
+<meta property="og:title" content="Treblle ROI Estimator">
+<meta property="og:description" content="Calculate your ROI with Treblle — see time and cost savings instantly.">
+<meta property="og:image" content="https://treblle-roi-api.vercel.app/assets/treblle-roi-preview.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
   :root{
     --bg:#070c16;
@@ -85,11 +91,15 @@
   /* small disclaimer style */
   .disclaimer{margin-top:6px;color:var(--muted);font-size:12px}
 </style>
+<link rel="stylesheet" href="assets/mobile.css">
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Treblle Enterprise: ROI Estimator</h1>
+    <h1>
+      <img src="assets/treblle-logo.svg" alt="Treblle" style="height:28px;vertical-align:middle;margin-right:8px;">
+      Treblle Enterprise: ROI Estimator
+    </h1>
     <p class="sub">Estimate your API time-savings, net value, ROI multiple, and payback - based on your inputs.</p>
     <div class="disclaimer">This tool provides operational efficiency estimates only. Results depend on your inputs and model assumptions; actual outcomes may vary.</div>
   </header>
@@ -104,20 +114,20 @@
       </div>
 
       <div class="section">Company & Traffic</div>
-      <div class="row"><label>Company name</label><input id="company" placeholder="Optional" /><div></div></div>
-      <div class="row"><label>Annual API requests</label><input id="annualRequests" type="number" value="300000000" class="mono"/><div class="hint">For context only</div></div>
-      <div class="row"><label>Monthly API growth (%)</label><input id="monthlyGrowth" type="number" value="10" step="0.1" class="mono"/><div></div></div>
-      <div class="row"><label>Production APIs (count)</label><input id="numAPIs" type="number" value="25" min="1" step="1" class="mono"/><div class="hint">Base includes 25</div></div>
-      <div class="row"><label>API consumers / partners (count)</label><input id="numConsumers" type="number" value="1000" min="0" step="1" class="mono"/><div></div></div>
+      <div class="row"><label for="company">Company name</label><input id="company" placeholder="Optional" /><div></div></div>
+      <div class="row"><label for="annualRequests">Annual API requests</label><input id="annualRequests" type="number" value="300000000" class="mono"/><div class="hint">For context only</div></div>
+      <div class="row"><label for="monthlyGrowth">Monthly API growth (%)</label><input id="monthlyGrowth" type="number" value="10" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label for="numAPIs">Production APIs (count)</label><input id="numAPIs" type="number" value="25" min="1" step="1" class="mono"/><div class="hint">Base includes 25</div></div>
+      <div class="row"><label for="numConsumers">API consumers / partners (count)</label><input id="numConsumers" type="number" value="1000" min="0" step="1" class="mono"/><div></div></div>
 
       <div class="section">Support & Engineering Baseline</div>
-      <div class="row"><label>Support tickets per month (all)</label><input id="ticketsPerMonth" type="number" value="200" class="mono"/><div></div></div>
-      <div class="row"><label>% of tickets that are API-related</label><input id="pctApiTickets" type="number" value="70" step="0.1" class="mono"/><div></div></div>
-      <div class="row"><label>% of API tickets escalated to engineering</label><input id="pctEscalated" type="number" value="30" step="0.1" class="mono"/><div></div></div>
-      <div class="row"><label>Avg Support time per API ticket (hours)</label><input id="hrsSupportPerTicket" type="number" value="0.5" step="0.01" class="mono"/><div></div></div>
-      <div class="row"><label>Avg Engineering time per escalated ticket (hours)</label><input id="hrsEngPerEscalation" type="number" value="1.0" step="0.01" class="mono"/><div></div></div>
-      <div class="row"><label>Hourly loaded cost - Support ($)</label><input id="rateSupport" type="number" value="45" class="mono"/><div></div></div>
-      <div class="row"><label>Hourly loaded cost - Engineering ($)</label><input id="rateEng" type="number" value="85" class="mono"/><div></div></div>
+      <div class="row"><label for="ticketsPerMonth">Support tickets per month (all)</label><input id="ticketsPerMonth" type="number" value="200" class="mono"/><div></div></div>
+      <div class="row"><label for="pctApiTickets">% of tickets that are API-related</label><input id="pctApiTickets" type="number" value="70" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label for="pctEscalated">% of API tickets escalated to engineering</label><input id="pctEscalated" type="number" value="30" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label for="hrsSupportPerTicket">Avg Support time per API ticket (hours)</label><input id="hrsSupportPerTicket" type="number" value="0.5" step="0.01" class="mono"/><div></div></div>
+      <div class="row"><label for="hrsEngPerEscalation">Avg Engineering time per escalated ticket (hours)</label><input id="hrsEngPerEscalation" type="number" value="1.0" step="0.01" class="mono"/><div></div></div>
+      <div class="row"><label for="rateSupport">Hourly loaded cost - Support ($)</label><input id="rateSupport" type="number" value="45" class="mono"/><div></div></div>
+      <div class="row"><label for="rateEng">Hourly loaded cost - Engineering ($)</label><input id="rateEng" type="number" value="85" class="mono"/><div></div></div>
 
       <div class="section">Analysis & Governance</div>
       <div class="row"><label>Weekly hours on customer pattern analysis (team total)</label><input id="weeklyPatternHours" type="number" value="20" step="0.1" class="mono"/><div></div></div>
@@ -169,7 +179,7 @@
       </details>
     </div>
 
-    <div class="card">
+    <div class="card" aria-live="polite">
       <h2>Results</h2>
 
       <div class="summary">
@@ -352,11 +362,11 @@
       {key:"pattern", title:"Weekly pattern-analysis effort", before:v.weeklyPatternHours, after:patternWeeklyAfter, unit:"hrs", savings:patternSavings}
     ];
     const iconsMap = {
-      support:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M6 8a6 6 0 1112 0v3a2 2 0 012 2v4a2 2 0 01-2 2h-2v-7h2V8a8 8 0 10-16 0v3h2v7H6a2 2 0 01-2-2v-4a2 2 0 012-2V8z'/></svg>`,
-      eng:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M9.75 6.75l4.5 4.5-4.5 4.5M4.5 6.75h5.25M14.25 17.25H19.5'/></svg>`,
-      comms:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M21 15a3 3 0 01-3 3H8l-5 3V6a3 3 0 013-3h12a3 3 0 013 3v9z'/></svg>`,
-      azure:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><circle cx='12' cy='12' r='8'/><path d='M12 6v6l3 3'/></svg>`,
-      pattern:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M4 17l6-6 4 4 6-6'/><path d='M16 5h4v4'/></svg>`
+      support:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' aria-hidden='true'><path d='M6 8a6 6 0 1112 0v3a2 2 0 012 2v4a2 2 0 01-2 2h-2v-7h2V8a8 8 0 10-16 0v3h2v7H6a2 2 0 01-2-2v-4a2 2 0 012-2V8z'/></svg>`,
+      eng:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' aria-hidden='true'><path d='M9.75 6.75l4.5 4.5-4.5 4.5M4.5 6.75h5.25M14.25 17.25H19.5'/></svg>`,
+      comms:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' aria-hidden='true'><path d='M21 15a3 3 0 01-3 3H8l-5 3V6a3 3 0 013-3h12a3 3 0 013 3v9z'/></svg>`,
+      azure:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' aria-hidden='true'><circle cx='12' cy='12' r='8'/><path d='M12 6v6l3 3'/></svg>`,
+      pattern:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' aria-hidden='true'><path d='M4 17l6-6 4 4 6-6'/><path d='M16 5h4v4'/></svg>`
     };
     const areasEl = $('areas'); areasEl.innerHTML = "";
     areas.forEach(a=>{
