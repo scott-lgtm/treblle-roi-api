@@ -94,9 +94,11 @@
   }
   
   /* Header */
-  header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--spacing-md);margin-bottom:var(--spacing-xl)}
-  header h1{margin:0;font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:.2px;color:var(--text-heading)}
-  header .sub{margin:0;color:var(--muted)}
+  header{margin-bottom:var(--spacing-xl)}
+  .header-brand{display:flex;align-items:center;margin-bottom:var(--spacing-md)}
+  .header-brand img{height:40px;margin-right:var(--spacing-md)}
+  .header-content h1{margin:0;font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:.2px;color:var(--text-heading)}
+  .header-content .sub{margin:var(--spacing-xs) 0 0;color:var(--muted);font-size:16px;line-height:1.4}
   
   /* Grid Layout */
   .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:var(--spacing-xl)}
@@ -175,12 +177,14 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>
-      <img src="treblle-logo.svg" alt="Treblle" style="height:28px;vertical-align:middle;margin-right:8px;">
-      Treblle Enterprise: ROI Estimator
-    </h1>
-    <p class="sub">Estimate your API time-savings, net value, ROI multiple, and payback - based on your inputs.</p>
-    <div class="disclaimer">This tool provides operational efficiency estimates only. Results depend on your inputs and model assumptions; actual outcomes may vary.</div>
+    <div class="header-brand">
+      <img src="treblle-logo.svg" alt="Treblle" />
+    </div>
+    <div class="header-content">
+      <h1>Treblle Enterprise: ROI Estimator</h1>
+      <p class="sub">Estimate your API time-savings, net value, ROI multiple, and payback - based on your inputs.</p>
+      <div class="disclaimer">This tool provides operational efficiency estimates only. Results depend on your inputs and model assumptions; actual outcomes may vary.</div>
+    </div>
   </header>
 
   <div class="grid">
