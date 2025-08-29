@@ -64,6 +64,10 @@
     --border: var(--treblle-element-200);
     --ring: var(--treblle-electric-100);
     --glass: rgba(255,255,255,.04);
+    
+    /* Opaque secondary for dark surfaces; tuned for legibility next to fields */
+    --text-fieldnote: #D6E2FF;
+    --brand-logo-size: 42px; /* adjust 38–44px to taste */
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -198,6 +202,35 @@
   footer a{color:var(--treblle-electric-200);text-decoration:none}
   footer a:hover{text-decoration:underline}
   
+  /* ---- Left Inputs panel: high-contrast notes & placeholders ---- */
+  
+  .pane-inputs .field-note,
+  .pane-inputs small.field-note {
+    color: var(--text-fieldnote);
+    font-size: clamp(13px, 1.6vw, 15px);
+    line-height: 1.35;
+    letter-spacing: 0.1px;
+    font-weight: 500;
+    opacity: 1; /* ensure no prior rules fade it */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Placeholders like "Optional" inside inputs — readable, not washed out */
+  .pane-inputs input::placeholder,
+  .pane-inputs textarea::placeholder {
+    color: var(--text-fieldnote);
+    opacity: 1;
+    font-weight: 500;
+  }
+  
+  /* Keep rows tidy so notes don't feel cramped */
+  .pane-inputs .row { margin-bottom: 16px; }
+  
+  /* Larger logo */
+  .header-brand img { height: var(--brand-logo-size); display: block; }
+  .header-brand + .header-content { margin-top: 12px; }
+  
   /* Error and Loading States */
   .error-message{background:rgba(239,68,68,.1);border:1px solid var(--bad);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:13px;color:var(--bad);display:none}
   .error-message.show{display:block}
@@ -221,7 +254,7 @@
   </header>
 
   <div class="grid">
-    <div class="card">
+    <div class="card pane-inputs">
       <h2>Inputs</h2>
       <div class="badges">
         <div class="badge">Conservative adjustment applied to benefits</div>
@@ -231,9 +264,9 @@
 
       <div class="section">Company & Traffic</div>
       <div class="row"><label for="company">Company name</label><input id="company" placeholder="Optional" /><div></div></div>
-      <div class="row"><label for="annualRequests">Annual API requests</label><input id="annualRequests" type="number" value="300000000" class="mono"/><div class="hint">For context only</div></div>
+      <div class="row"><label for="annualRequests">Annual API requests</label><input id="annualRequests" type="number" value="300000000" class="mono"/><div class="hint"><small class="field-note">For context only</small></div></div>
       <div class="row"><label for="monthlyGrowth">Monthly API growth (%)</label><input id="monthlyGrowth" type="number" value="10" step="0.1" class="mono"/><div></div></div>
-      <div class="row"><label for="numAPIs">Production APIs (count)</label><input id="numAPIs" type="number" value="25" min="1" step="1" class="mono"/><div class="hint">Base includes 25</div></div>
+      <div class="row"><label for="numAPIs">Production APIs (count)</label><input id="numAPIs" type="number" value="25" min="1" step="1" class="mono"/><div class="hint"><small class="field-note">Base includes 25</small></div></div>
       <div class="row"><label for="numConsumers">API consumers / partners (count)</label><input id="numConsumers" type="number" value="1000" min="0" step="1" class="mono"/><div></div></div>
 
       <div class="section">Support & Engineering Baseline</div>
@@ -262,10 +295,10 @@
       <div class="row"><label>Developer portal license savings ($/year)</label><input id="devPortalSavings" type="number" value="0" class="mono"/><div></div></div>
 
       <div class="section">Assumptions & Deployment</div>
-      <div class="row"><label>Conservatism factor (%)</label><input id="confidence" type="number" value="80" step="1" class="mono"/><div class="hint">Applies a discount to benefits</div></div>
+      <div class="row"><label>Conservatism factor (%)</label><input id="confidence" type="number" value="80" step="1" class="mono"/><div class="hint"><small class="field-note">Applies a discount to benefits</small></div></div>
       <div class="row"><label>Deployment</label>
         <select id="deployment"><option value="SaaS" selected>SaaS</option><option value="Private">Private</option></select>
-        <div class="hint">Override value bypasses estimator</div>
+        <div class="hint"><small class="field-note">Override value bypasses estimator</small></div>
       </div>
       <div class="row"><label>Treblle annual cost (override)</label><input id="override" type="number" placeholder="Leave blank to auto-estimate" class="mono"/><div></div></div>
       <div class="row"><label>Customer communication per ticket (hours)</label><input id="commsHoursPerTicket" type="number" value="0.25" step="0.01" class="mono"/><div></div></div>
@@ -288,10 +321,10 @@
         <div class="row"><label>Gateway/SQL manual query time reduction (%)</label><input id="bmAzure" type="number" value="90.0" step="0.1" class="mono"/><div></div></div>
 
         <div class="section">Pricing (auto-estimate when override is blank)</div>
-        <div class="row"><label>SaaS base ($/yr)</label><input id="pSaaSBase" type="number" value="35988" class="mono"/><div class="hint">$2,999/mo</div></div>
-        <div class="row"><label>SaaS add-on pack 25 APIs (annual)</label><input id="pSaaS25" type="number" value="10800" class="mono"/><div class="hint">+1B req</div></div>
-        <div class="row"><label>Private Cloud base ($/yr)</label><input id="pPrivBase" type="number" value="71976" class="mono"/><div class="hint">$5,998/mo</div></div>
-        <div class="row"><label>Private Cloud per-API (beyond 25) ($/yr)</label><input id="pPrivPerAPI" type="number" value="360" class="mono"/><div class="hint">$30/API/mo</div></div>
+        <div class="row"><label>SaaS base ($/yr)</label><input id="pSaaSBase" type="number" value="35988" class="mono"/><div class="hint"><small class="field-note">$2,999/mo</small></div></div>
+        <div class="row"><label>SaaS add-on pack 25 APIs (annual)</label><input id="pSaaS25" type="number" value="10800" class="mono"/><div class="hint"><small class="field-note">+1B req</small></div></div>
+        <div class="row"><label>Private Cloud base ($/yr)</label><input id="pPrivBase" type="number" value="71976" class="mono"/><div class="hint"><small class="field-note">$5,998/mo</small></div></div>
+        <div class="row"><label>Private Cloud per-API (beyond 25) ($/yr)</label><input id="pPrivPerAPI" type="number" value="360" class="mono"/><div class="hint"><small class="field-note">$30/API/mo</small></div></div>
       </details>
     </div>
 
