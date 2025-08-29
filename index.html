@@ -10,20 +10,34 @@
 <meta property="og:description" content="Calculate your ROI with Treblle — see time and cost savings instantly.">
 <meta property="og:image" content="https://treblle-roi-api.vercel.app/assets/treblle-roi-preview.png">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="dark">
 <style>
   :root{
-    --bg:#070c16;
-    --surface:#0b1220;
-    --panel:#0f1726;
-    --muted:#8aa0be;
-    --text:#e6eefc;
-    --primary:#5ac8fa;
-    --accent:#7ee2ff;
-    --good:#16c784;
-    --warn:#f59e0b;
-    --bad:#ef4444;
-    --border:rgba(130,150,180,.25);
-    --ring: rgba(122, 229, 255, .45);
+    /* Treblle Brand Colors */
+    color-scheme: dark;
+    --treblle-midnight: #01041A;
+    --treblle-obsidian: #14182F;
+    --treblle-primary: #0058FF;
+    --treblle-electric-200: #4A90E2;
+    --treblle-electric-100: #6BA6F0;
+    --treblle-element-200: rgba(130,150,180,.3);
+    --treblle-element-300: rgba(130,150,180,.5);
+    --treblle-fog: #E6EEFC;
+    --treblle-white: #FFFFFF;
+    
+    /* Updated theme variables */
+    --bg: var(--treblle-midnight);
+    --surface: var(--treblle-obsidian);
+    --panel: var(--treblle-obsidian);
+    --muted: #8aa0be;
+    --text: var(--treblle-fog);
+    --primary: var(--treblle-primary);
+    --accent: var(--treblle-electric-200);
+    --good: #16c784;
+    --warn: #f59e0b;
+    --bad: #ef4444;
+    --border: var(--treblle-element-200);
+    --ring: var(--treblle-electric-100);
     --glass: rgba(255,255,255,.04);
   }
   *{box-sizing:border-box}
@@ -32,11 +46,13 @@
     margin:0;
     color:var(--text);
     background:
-      radial-gradient(1200px 800px at 75% -10%, rgba(90,200,250,.25), transparent 60%),
-      radial-gradient(1200px 800px at -10% 110%, rgba(110,231,255,.18), transparent 60%),
-      linear-gradient(180deg, #060b13, #0a0f1a 35%, #060b13);
+      radial-gradient(1200px 800px at 75% -10%, rgba(0,88,255,.15), transparent 60%),
+      radial-gradient(1200px 800px at -10% 110%, rgba(74,144,226,.12), transparent 60%),
+      var(--treblle-midnight);
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
     line-height:1.45;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   .wrap{max-width:1220px;margin:28px auto 88px;padding:0 18px}
   header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:18px}
@@ -45,7 +61,7 @@
   .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
   @media (max-width: 980px){.grid{grid-template-columns:1fr}}
   .card{
-    background: linear-gradient(180deg, var(--glass), transparent);
+    background: var(--surface);
     border:1px solid var(--border);
     border-radius:18px;
     padding:16px;
@@ -58,21 +74,34 @@
   .section{margin:10px 0 4px;padding-top:8px;border-top:1px dashed var(--border);color:#cbd5e1;font-weight:700;text-transform:uppercase;letter-spacing:.6px;font-size:12px}
   .row{display:grid;grid-template-columns:1.3fr .7fr .7fr;gap:10px;padding:6px 0;align-items:center}
   .row label{color:#cbd5e1;font-size:13px}
-  .row input,.row select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:#0b1424;color:var(--text);outline:none;transition:border .15s, box-shadow .15s}
-  .row input:focus,.row select:focus{box-shadow:0 0 0 3px var(--ring);border-color:transparent}
+  .row input,.row select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--treblle-element-300);background:var(--treblle-obsidian);color:var(--treblle-fog);outline:none;transition:all .15s}
+  .row input:hover,.row select:hover{border-color:var(--treblle-element-200)}
+  .row input:focus,.row select:focus{box-shadow:0 0 0 3px var(--ring);border-color:var(--treblle-electric-200);background:var(--surface)}
+  .row input:invalid{border-color:var(--bad);box-shadow:0 0 0 1px var(--bad)}
+  .row input.error{border-color:var(--bad);box-shadow:0 0 0 2px rgba(239,68,68,.2)}
+  .row input.success{border-color:var(--good);box-shadow:0 0 0 2px rgba(22,199,132,.2)}
   .row input[type=number]{text-align:right}
   .hint{color:var(--muted);font-size:12px}
   .stack{display:flex;gap:10px;flex-wrap:wrap}
-  .btn{border:1px solid var(--border);background:#0b1424;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer}
-  .btn.primary{background:linear-gradient(180deg, var(--primary), var(--accent));color:#051320;font-weight:800;border:none}
+  .btn{border:1px solid var(--border);background:var(--treblle-obsidian);color:var(--treblle-fog);padding:10px 14px;border-radius:12px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+  .btn:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+  .btn:focus{outline:none;box-shadow:0 0 0 3px var(--treblle-electric-100)}
+  .btn.primary{background:var(--treblle-primary);color:var(--treblle-white);font-weight:800;border:none}
+  .btn.primary:hover{background:var(--treblle-electric-200);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,88,255,.3)}
+  .btn.primary:focus{box-shadow:0 0 0 3px var(--treblle-electric-100)}
+  .btn.primary:active{transform:translateY(1px);box-shadow:0 2px 8px rgba(0,88,255,.2)}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn.loading{cursor:not-allowed}
+  .btn.loading::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:16px;height:16px;border:2px solid transparent;border-top:2px solid currentColor;border-radius:50%;animation:spin 1s linear infinite}
+  @keyframes spin{0%{transform:translate(-50%,-50%) rotate(0deg)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
   .summary{display:grid;grid-template-columns: repeat(2, minmax(0,1fr));gap:14px}
-  .kpi{background:#091325;border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:2px}
+  .kpi{background:var(--treblle-obsidian);border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:2px}
   .kpi h3{margin:0;color:#cbd5e1;font-size:13px}
   .kpi .val{font-size:clamp(20px,3.3vw,30px);font-weight:900}
   .kpi .trend{font-size:12px;color:var(--muted)}
   .mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
   .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-  .badge{font-size:12px;padding:6px 8px;border-radius:999px;border:1px solid var(--border);background:#0a1322;color:#cfe6ff}
+  .badge{font-size:12px;padding:6px 8px;border-radius:999px;border:1px solid var(--border);background:var(--treblle-obsidian);color:var(--treblle-fog)}
   .impact{display:grid;grid-template-columns:1fr;gap:10px;margin-top:8px}
   .impactCard{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;background:linear-gradient(180deg,rgba(135,207,255,.06),rgba(255,255,255,.02));border:1px solid var(--border);border-radius:16px;padding:12px 14px}
   .icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(220px 90px at 120% -10%, rgba(90,200,250,.25), transparent 60%),#0a1422;border:1px solid var(--border)}
@@ -85,11 +114,19 @@
   .bar>span{position:absolute;inset:0 100% 0 0;background:linear-gradient(90deg, var(--primary), var(--accent))}
   .drivers{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:10px;margin-top:10px}
   @media (max-width:520px){.drivers{grid-template-columns:1fr}}
-  .driver{background:#091325;border:1px solid var(--border);border-radius:14px;padding:12px}
+  .driver{background:var(--treblle-obsidian);border:1px solid var(--border);border-radius:14px;padding:12px}
   .driver .name{color:#cbd5e1;font-size:12px;margin-bottom:4px}
   .driver .amt{font-weight:800}
   /* small disclaimer style */
   .disclaimer{margin-top:6px;color:var(--muted);font-size:12px}
+  
+  /* Error and Loading States */
+  .error-message{background:rgba(239,68,68,.1);border:1px solid var(--bad);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:13px;color:var(--bad);display:none}
+  .error-message.show{display:block}
+  .loading-state{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-top:8px}
+  .loading-state .spinner{width:16px;height:16px;border:2px solid var(--treblle-element-300);border-top:2px solid var(--treblle-electric-200);border-radius:50%;animation:spin 1s linear infinite}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
+  .empty-state svg{width:48px;height:48px;opacity:0.5;margin-bottom:16px}
 </style>
 <link rel="stylesheet" href="assets/mobile.css">
 </head>
