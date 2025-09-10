@@ -378,6 +378,12 @@
           <div class="trend">12 × cost / benefit</div>
         </div>
       </div>
+
+      <div class="section">Areas of Improvement</div>
+      <div class="impact" id="areas"></div>
+
+      <div class="section">Top Drivers by $ Impact</div>
+      <div class="drivers" id="drivers"></div>
       
       <!-- Export Options -->
       <div style="margin: 20px 0; padding: 16px; background: var(--treblle-obsidian); border: 1px solid var(--border); border-radius: 12px;">
@@ -397,12 +403,6 @@
           </button>
         </div>
       </div>
-
-      <div class="section">Areas of Improvement</div>
-      <div class="impact" id="areas"></div>
-
-      <div class="section">Top Drivers by $ Impact</div>
-      <div class="drivers" id="drivers"></div>
 
       <div class="disclaimer">These outputs are estimates based on user-provided inputs and model assumptions.</div>
     </div>
@@ -632,7 +632,206 @@
   
   // Export Functions - Added separately, don't touch calculations above
   window.exportToPDF = function() {
-    window.print();
+    const v = read();
+    const company = v.company || 'Your Organization';
+    
+    // Calculate all values for the report
+    const apiTicketsMo = v.ticketsPerMonth * (v.pctApiTickets/100);
+    const escalationsMo = apiTicketsMo * (v.pctEscalated/100);
+    const annualSupportHrs = apiTicketsMo * v.hrsSupportPerTicket * 12;
+    const annualEngHrs = escalationsMo * v.hrsEngPerEscalation * 12;
+    const supportHrsSaved = annualSupportHrs * (v.bmSupport/100);
+    const engHrsSaved = annualEngHrs * (v.bmEng/100);
+    const supportSavings = supportHrsSaved * v.rateSupport;
+    const engSavings = engHrsSaved * v.rateEng;
+    const commsHoursSaved = apiTicketsMo * v.commsHoursPerTicket * 12 * (v.bmComms/100);
+    const commsSavings = commsHoursSaved * v.rateSupport;
+    const azureHoursSaved = v.azureHours * 12 * (v.bmAzure/100);
+    const azureSavings = azureHoursSaved * v.rateEng;
+    const patternHoursSaved = v.weeklyPatternHours * 52;
+    const patternSavings = patternHoursSaved * v.rateAnalytics;
+    const retentionSavings = (v.retentionRisk/100) * v.customers * v.arpa;
+    const complianceAvoid = v.complianceFTE * v.fteCost;
+    const altToolingAvoid = v.altTooling;
+    const devPortalSave = v.devPortalSavings;
+    
+    const subtotal = supportSavings + engSavings + commsSavings + azureSavings + patternSavings + retentionSavings + complianceAvoid + altToolingAvoid + devPortalSave;
+    const benefit = subtotal * (v.confidence/100);
+    
+    let estCost = 0;
+    let costNote = '';
+    if (v.override !== "" && v.override > 0){
+      estCost = v.override; costNote = 'Override';
+    } else if (v.deployment === "SaaS"){
+      const base = v.pSaaSBase;
+      const extraAPIs = Math.max(0, v.numAPIs - 25);
+      const packs25 = extraAPIs === 0 ? 0 : Math.ceil(extraAPIs/25);
+      estCost = base + packs25 * v.pSaaS25; costNote = `SaaS: base + ${packs25}×25-pack`;
+    } else {
+      const base = v.pPrivBase;
+      const overAPIs = Math.max(0, v.numAPIs - 25);
+      estCost = base + overAPIs * v.pPrivPerAPI; costNote = `Private: base + ${overAPIs} over-APIs`;
+    }
+    
+    const net = benefit - estCost;
+    const roi = estCost > 0 ? (net / estCost) : 0;
+    const paybackMonths = benefit > 0 ? (12 * estCost / benefit) : 0;
+    const totalHoursSaved = supportHrsSaved + engHrsSaved + commsHoursSaved + azureHoursSaved + patternHoursSaved;
+    
+    // Create comprehensive PDF-friendly HTML
+    const printHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Treblle ROI Analysis - ${company}</title>
+      <style>
+        @media print {
+          * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; }
+          .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0058ff; padding-bottom: 20px; }
+          .header h1 { color: #0058ff; margin: 0; font-size: 24px; }
+          .header .subtitle { color: #64748b; font-size: 16px; margin: 10px 0; }
+          .section { margin: 20px 0; page-break-inside: avoid; }
+          .section h2 { color: #1e293b; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 16px; }
+          .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+          .kpi-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; background: #f8fafc; }
+          .kpi-card h3 { margin: 0 0 8px 0; color: #64748b; font-size: 14px; }
+          .kpi-card .value { font-size: 20px; font-weight: 900; color: #1e293b; }
+          .kpi-card .note { color: #64748b; font-size: 12px; margin-top: 4px; }
+          .input-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+          .input-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #f1f5f9; }
+          .input-label { color: #475569; }
+          .input-value { font-weight: 600; color: #1e293b; }
+          .savings-breakdown { margin: 16px 0; }
+          .savings-item { display: flex; justify-content: space-between; padding: 8px; background: #f8fafc; margin-bottom: 4px; border-radius: 4px; }
+          .page-break { page-break-before: always; }
+          .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 12px; }
+        }
+        @media screen {
+          body { max-width: 800px; margin: 0 auto; padding: 40px; background: white; }
+          .header, .section, .kpi-grid, .input-grid, .savings-breakdown { margin-bottom: 30px; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>Treblle ROI Analysis</h1>
+        <div class="subtitle">API Intelligence Platform</div>
+        <div style="color: #64748b; margin-top: 12px;">
+          <strong>${company}</strong><br>
+          Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2>Executive Summary</h2>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <h3>Net Annual Value</h3>
+            <div class="value">${money(net, v.currency)}</div>
+            <div class="note">After ${Math.round(v.confidence)}% conservatism adjustment</div>
+          </div>
+          <div class="kpi-card">
+            <h3>ROI Multiple</h3>
+            <div class="value">${roi.toFixed(2)}x</div>
+            <div class="note">Return on investment</div>
+          </div>
+          <div class="kpi-card">
+            <h3>Payback Period</h3>
+            <div class="value">${paybackMonths.toFixed(1)} months</div>
+            <div class="note">Time to recover investment</div>
+          </div>
+          <div class="kpi-card">
+            <h3>Annual Hours Saved</h3>
+            <div class="value">${Math.round(totalHoursSaved).toLocaleString()}</div>
+            <div class="note">Team productivity improvement</div>
+          </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+          <div class="kpi-card">
+            <h3>Gross Benefit (Annual)</h3>
+            <div class="value">${money(benefit, v.currency)}</div>
+            <div class="note">Conservative estimate</div>
+          </div>
+          <div class="kpi-card">
+            <h3>Treblle Investment</h3>
+            <div class="value">${money(estCost, v.currency)}</div>
+            <div class="note">${costNote}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2>Savings Breakdown</h2>
+        <div class="savings-breakdown">
+          <div class="savings-item"><span>Support Time Savings</span><span>${money(supportSavings, v.currency)}</span></div>
+          <div class="savings-item"><span>Engineering Time Savings</span><span>${money(engSavings, v.currency)}</span></div>
+          <div class="savings-item"><span>Communication Overhead Savings</span><span>${money(commsSavings, v.currency)}</span></div>
+          <div class="savings-item"><span>Gateway/SQL Query Savings</span><span>${money(azureSavings, v.currency)}</span></div>
+          <div class="savings-item"><span>Pattern Analysis Savings</span><span>${money(patternSavings, v.currency)}</span></div>
+          <div class="savings-item"><span>Customer Retention Value</span><span>${money(retentionSavings, v.currency)}</span></div>
+          ${complianceAvoid > 0 ? `<div class="savings-item"><span>Compliance FTE Avoidance</span><span>${money(complianceAvoid, v.currency)}</span></div>` : ''}
+          ${altToolingAvoid > 0 ? `<div class="savings-item"><span>Alternative Tooling Avoided</span><span>${money(altToolingAvoid, v.currency)}</span></div>` : ''}
+          ${devPortalSave > 0 ? `<div class="savings-item"><span>Dev Portal Savings</span><span>${money(devPortalSave, v.currency)}</span></div>` : ''}
+        </div>
+      </div>
+      
+      <div class="page-break"></div>
+      
+      <div class="section">
+        <h2>Key Assumptions & Inputs</h2>
+        <div class="input-grid">
+          <div class="input-item"><span class="input-label">Annual API Requests</span><span class="input-value">${v.annualRequests.toLocaleString()}</span></div>
+          <div class="input-item"><span class="input-label">Production APIs</span><span class="input-value">${v.numAPIs}</span></div>
+          <div class="input-item"><span class="input-label">API Consumers/Partners</span><span class="input-value">${v.numConsumers.toLocaleString()}</span></div>
+          <div class="input-item"><span class="input-label">Monthly Growth Rate</span><span class="input-value">${v.monthlyGrowth}%</span></div>
+          <div class="input-item"><span class="input-label">Support Tickets/Month</span><span class="input-value">${v.ticketsPerMonth}</span></div>
+          <div class="input-item"><span class="input-label">% API-Related Tickets</span><span class="input-value">${v.pctApiTickets}%</span></div>
+          <div class="input-item"><span class="input-label">% Escalated to Engineering</span><span class="input-value">${v.pctEscalated}%</span></div>
+          <div class="input-item"><span class="input-label">Support Hours/Ticket</span><span class="input-value">${v.hrsSupportPerTicket}</span></div>
+          <div class="input-item"><span class="input-label">Engineering Hours/Escalation</span><span class="input-value">${v.hrsEngPerEscalation}</span></div>
+          <div class="input-item"><span class="input-label">Support Rate (${v.currency}/hr)</span><span class="input-value">${v.rateSupport}</span></div>
+          <div class="input-item"><span class="input-label">Engineering Rate (${v.currency}/hr)</span><span class="input-value">${v.rateEng}</span></div>
+          <div class="input-item"><span class="input-label">Analytics Rate (${v.currency}/hr)</span><span class="input-value">${v.rateAnalytics}</span></div>
+          <div class="input-item"><span class="input-label">Weekly Pattern Analysis Hours</span><span class="input-value">${v.weeklyPatternHours}</span></div>
+          <div class="input-item"><span class="input-label">Monthly Gateway/SQL Hours</span><span class="input-value">${v.azureHours}</span></div>
+          <div class="input-item"><span class="input-label">Customer Count</span><span class="input-value">${v.customers.toLocaleString()}</span></div>
+          <div class="input-item"><span class="input-label">Average Customer Value</span><span class="input-value">${money(v.arpa, v.currency)}</span></div>
+          <div class="input-item"><span class="input-label">Retention Risk %</span><span class="input-value">${v.retentionRisk}%</span></div>
+          <div class="input-item"><span class="input-label">Conservatism Factor</span><span class="input-value">${v.confidence}%</span></div>
+          <div class="input-item"><span class="input-label">Deployment Type</span><span class="input-value">${v.deployment}</span></div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2>Efficiency Improvements</h2>
+        <div class="savings-breakdown">
+          <div class="savings-item"><span>Support Time Reduction</span><span>${v.bmSupport}%</span></div>
+          <div class="savings-item"><span>Engineering Time Reduction</span><span>${v.bmEng}%</span></div>
+          <div class="savings-item"><span>Communication Overhead Reduction</span><span>${v.bmComms}%</span></div>
+          <div class="savings-item"><span>Manual Query Time Reduction</span><span>${v.bmAzure}%</span></div>
+        </div>
+      </div>
+      
+      <div class="footer">
+        <div><strong>Treblle</strong> - API Intelligence Platform</div>
+        <div>© 2025 Treblle • <a href="mailto:sales@treblle.com">sales@treblle.com</a></div>
+        <div style="margin-top: 8px;">Generated by Treblle ROI Estimator • ${window.location.href}</div>
+        <div style="margin-top: 8px; font-style: italic;">These outputs are estimates based on user-provided inputs and model assumptions.</div>
+      </div>
+    </body>
+    </html>
+    `;
+    
+    // Open new window and print
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printHTML);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
   };
   
   window.copyResults = function() {
