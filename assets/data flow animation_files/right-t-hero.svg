@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 603 968">
+  <!-- Generator: Adobe Illustrator 29.2.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 116)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: url(#linear-gradient2);
+      }
+
+      .st1 {
+        fill: url(#linear-gradient1);
+      }
+
+      .st2 {
+        fill: url(#linear-gradient3);
+      }
+
+      .st3 {
+        fill: url(#linear-gradient);
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="253.6" y1="188.2" x2="508.1" y2="314" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".2" stop-color="#0155f5"/>
+      <stop offset=".4" stop-color="#162f6b"/>
+      <stop offset="1" stop-color="#162f6b" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient1" x1="360.5" y1="518.5" x2="497.1" y2="560.3" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#162f6b" stop-opacity="0"/>
+      <stop offset="0" stop-color="#162f6b"/>
+      <stop offset=".7" stop-color="#162f6b"/>
+      <stop offset="1" stop-color="#162f6b" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient2" x1="86.7" y1="968" x2="85.7" y2="968" gradientTransform="translate(-21798.8 1144.6) scale(254.5 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".2" stop-color="#0058fe"/>
+      <stop offset="1" stop-color="#162f6b" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient3" x1="0" y1="807.9" x2="0" y2="808.9" gradientTransform="translate(255 142245.1) scale(1 -175.8)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".3" stop-color="#0058fe"/>
+      <stop offset="1" stop-color="#29304b" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g id="homepage">
+    <g id="T">
+      <g id="right">
+        <g id="Fill-1">
+          <polygon class="st3" points="255.5 548.9 254.5 548.9 254.5 176.6 254.7 176.4 464.9 .7 603 .7 603 1.7 465.3 1.7 255.5 177.1 255.5 548.9"/>
+        </g>
+        <g id="Fill-1-Copy">
+          <polygon class="st1" points="469.1 967.2 468.1 967.2 468.1 176.9 603 176.9 603 177.9 469.1 177.9 469.1 967.2"/>
+        </g>
+        <g id="Fill-2">
+          <rect class="st0" x=".9" y="176.1" width="254.5" height="1"/>
+        </g>
+        <g id="Fill-2-Copy">
+          <rect class="st2" x="254.5" y="1.2" width="1" height="175.8"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
