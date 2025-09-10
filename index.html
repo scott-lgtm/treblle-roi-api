@@ -121,26 +121,39 @@
     overflow: hidden;
     border-radius: var(--radius-xl);
     margin-bottom: var(--spacing-xl);
+    min-height: 400px;
+    padding: var(--spacing-xl) var(--spacing-lg);
   }
   .hero-video-wrap {
     position: absolute;
     inset: 0;
-    z-index: -2;
+    z-index: 0;
   }
   .hero-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    opacity: 0.4;
   }
   .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(1,4,26,0.7), rgba(20,24,47,0.7));
-    z-index: -1;
+    background: linear-gradient(
+      rgba(1,4,26,0.85), 
+      rgba(20,24,47,0.75)
+    );
+    z-index: 1;
   }
   .header-brand, .header-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
+  }
+  
+  @media (max-width: 768px) {
+    .hero {
+      min-height: 300px;
+      padding: var(--spacing-lg) var(--spacing-md);
+    }
   }
   .header-content h1{margin:0;font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:.2px;color:var(--text-heading)}
   .header-content .sub{margin:var(--spacing-xs) 0 0;color:var(--muted);font-size:16px;line-height:1.4}
@@ -611,6 +624,28 @@
   $('resetBtn').addEventListener('click', ()=>{ applyDefaults(); calc(); });
   let t; document.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(calc,80); });
   applyDefaults(); calc();
+  
+  // Video autoplay handling
+  const video = document.querySelector('.hero-video');
+  if (video) {
+    video.addEventListener('loadeddata', () => {
+      console.log('Video loaded successfully');
+    });
+    
+    video.addEventListener('error', (e) => {
+      console.log('Video error:', e);
+    });
+    
+    // Try to play video when it's ready
+    video.addEventListener('canplaythrough', () => {
+      video.play().then(() => {
+        console.log('Video playing');
+      }).catch((error) => {
+        console.log('Autoplay prevented:', error);
+        // If autoplay fails, that's okay - we'll still show the first frame
+      });
+    });
+  }
 })();
 </script>
 </body>
