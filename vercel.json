@@ -32,6 +32,10 @@
       "dest": "/public/treblle-roi-preview.png"
     },
     {
+      "src": "/demo-video-treblle.mp4",
+      "dest": "/public/demo-video-treblle.mp4"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }
