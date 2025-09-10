@@ -6,6 +6,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "public/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "api/**/*.js",
       "use": "@vercel/node"
     }
@@ -14,6 +18,18 @@
     {
       "src": "/api/(.*)",
       "dest": "/api/$1"
+    },
+    {
+      "src": "/treblle-logo.svg",
+      "dest": "/public/treblle-logo.svg"
+    },
+    {
+      "src": "/treblle-favicon.png",
+      "dest": "/public/treblle-favicon.png"
+    },
+    {
+      "src": "/treblle-roi-preview.png",
+      "dest": "/public/treblle-roi-preview.png"
     },
     {
       "src": "/(.*)",

@@ -1,0 +1,37 @@
+/* Mobile First Responsive Design */
+@media (max-width: 480px) {
+  .wrap { padding: 0 12px; margin: 16px auto 60px; }
+  
+  .row { 
+    grid-template-columns: 1fr !important; 
+    gap: 8px !important; 
+    padding: 8px 0;
+  }
+  .row label { font-size: 12px; margin-bottom: 4px; }
+  .row input, .row select { padding: 10px; font-size: 14px; }
+  .row .hint { font-size: 11px; }
+  
+  .card { padding: 12px; border-radius: 12px; }
+  .card h2 { font-size: 18px; }
+  
+  .stack { flex-direction: column; }
+  .btn { padding: 12px 16px; font-size: 14px; }
+  
+  .summary { grid-template-columns: 1fr !important; gap: 12px; }
+  .kpi { padding: 12px; }
+  .kpi .val { font-size: 24px; }
+  
+  header h1 { font-size: 24px; line-height: 1.2; }
+  header .sub { font-size: 14px; }
+}
+
+@media (max-width: 520px) {
+  .grid { grid-template-columns: 1fr !important; }
+  .drivers { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 360px) {
+  .wrap { padding: 0 8px; }
+  .card { padding: 8px; }
+  .row input, .row select { font-size: 16px; } /* Prevent zoom on iOS */
+}

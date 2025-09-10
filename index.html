@@ -3,99 +3,258 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Treblle ROI Calculator</title>
+<title>Treblle ROI Estimator</title>
+<link rel="icon" type="image/png" href="treblle-favicon.png">
+<meta name="description" content="Calculate your ROI with Treblle — see time and cost savings instantly.">
+<meta property="og:title" content="Treblle ROI Estimator">
+<meta property="og:description" content="Calculate your ROI with Treblle — see time and cost savings instantly.">
+<meta property="og:image" content="treblle-roi-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="dark">
 <style>
   :root{
-    --bg:#070c16;
-    --surface:#0b1220;
-    --panel:#0f1726;
-    --muted:#8aa0be;
-    --text:#e6eefc;
-    --primary:#5ac8fa;
-    --accent:#7ee2ff;
-    --good:#16c784;
-    --warn:#f59e0b;
-    --bad:#ef4444;
-    --border:rgba(130,150,180,.25);
-    --ring: rgba(122, 229, 255, .45);
+    /* Treblle Brand Colors - Complete Token System */
+    color-scheme: dark;
+    --treblle-midnight: #01041A;
+    --treblle-obsidian: #14182F;
+    --treblle-primary: #0058FF;
+    --treblle-electric-200: #4A90E2;
+    --treblle-electric-100: #6BA6F0;
+    --treblle-element-200: rgba(130,150,180,.3);
+    --treblle-element-300: rgba(130,150,180,.5);
+    --treblle-fog: #E6EEFC;
+    --treblle-white: #FFFFFF;
+    --treblle-ruby-200: #ef4444;
+    --treblle-garden-200: #16c784;
+    
+    /* Design System Tokens */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 18px;
+    --radius-full: 999px;
+    
+    --shadow-card: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+    --shadow-card-hover: 0 20px 60px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
+    --shadow-btn: 0 4px 12px rgba(0,0,0,.2);
+    --shadow-btn-primary: 0 4px 16px rgba(0,88,255,.3);
+    --shadow-focus: 0 0 0 3px var(--treblle-electric-100);
+    
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    
+    /* Theme Variables */
+    --bg: var(--treblle-midnight);
+    --surface: var(--treblle-obsidian);
+    --surface-card: var(--treblle-obsidian);
+    --surface-field: #1B2344;
+    --panel: var(--treblle-obsidian);
+    --muted: #8aa0be;
+    --text: var(--treblle-fog);
+    --text-heading: var(--treblle-white);
+    --text-secondary: #D6E2FF;
+    --primary: var(--treblle-primary);
+    --accent: var(--treblle-electric-200);
+    --good: var(--treblle-garden-200);
+    --warn: #f59e0b;
+    --bad: var(--treblle-ruby-200);
+    --border: var(--treblle-element-200);
+    --ring: var(--treblle-electric-100);
     --glass: rgba(255,255,255,.04);
+    
+    /* Opaque secondary for dark surfaces; tuned for legibility next to fields */
+    --text-fieldnote: #D6E2FF;
+    --brand-logo-size: 42px; /* adjust 38–44px to taste */
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;
     color:var(--text);
-    background:
-      radial-gradient(1200px 800px at 75% -10%, rgba(90,200,250,.25), transparent 60%),
-      radial-gradient(1200px 800px at -10% 110%, rgba(110,231,255,.18), transparent 60%),
-      linear-gradient(180deg, #060b13, #0a0f1a 35%, #060b13);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
-    line-height:1.45;
+    background: linear-gradient(180deg, var(--treblle-midnight) 0%, var(--treblle-obsidian) 100%);
+    background-attachment: fixed;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    line-height:1.6;
+    font-weight:400;
+    font-synthesis:none;
+    text-rendering:optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
   }
-  .wrap{max-width:1220px;margin:28px auto 88px;padding:0 18px}
-  header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:18px}
-  header h1{margin:0;font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:.2px}
-  header .sub{margin:0;color:var(--muted)}
-  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
-  @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:-1;
+    background:
+      radial-gradient(1000px 600px at 20% -10%, rgba(255,255,255,.05), transparent 60%),
+      radial-gradient(1200px 700px at 80% 0%, rgba(106,166,240,.08), transparent 55%);
+  }
+  /* Layout & Responsive Container */
+  .wrap{
+    max-width:1024px;
+    margin:var(--spacing-xl) auto;
+    padding:0 var(--spacing-lg);
+    width:100%;
+  }
+  @media (max-width: 768px){
+    .wrap{padding:0 var(--spacing-md);margin:var(--spacing-lg) auto}
+  }
+  @media (max-width: 480px){
+    .wrap{padding:0 var(--spacing-sm)}
+  }
+  
+  /* Header */
+  header{margin-bottom:var(--spacing-xl)}
+  .header-brand{margin-bottom:var(--spacing-md)}
+  .header-brand img{height:40px;display:block}
+  .header-content{margin-top:12px}
+  .header-content h1{margin:0;font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:.2px;color:var(--text-heading)}
+  .header-content .sub{margin:var(--spacing-xs) 0 0;color:var(--muted);font-size:16px;line-height:1.4}
+  
+  /* Grid Layout */
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:var(--spacing-xl)}
+  @media (max-width: 980px){.grid{grid-template-columns:1fr;gap:var(--spacing-xl)}}
+  @media (max-width: 768px){.grid{gap:var(--spacing-xl)}}
+  @media (max-width: 420px){
+    .grid{gap:calc(var(--spacing-xl) * 1.5)}
+    .stack{flex-direction:column}
+    .btn{width:100%}
+    .kpi-subtext,.result-subtext,.kpi-caption,.currency-subtext{font-size:14px}
+  }
+  /* Card Primitive */
   .card{
-    background: linear-gradient(180deg, var(--glass), transparent);
-    border:1px solid var(--border);
-    border-radius:18px;
-    padding:16px;
-    box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+    background: var(--surface-card);
+    border:1px solid var(--treblle-element-300);
+    border-radius:var(--radius-xl);
+    padding:var(--spacing-lg);
+    box-shadow: 0 2px 10px rgba(0,0,0,.40);
     position:relative;
     overflow:clip;
+    transition: box-shadow 180ms ease;
   }
-  .card:before{content:"";position:absolute; inset:-1px;border-radius:18px;background: radial-gradient(600px 120px at 20% -40px, var(--ring), transparent 60%);pointer-events:none;opacity:.5}
-  .card h2{margin:0 0 8px;font-size:clamp(16px,2.1vw,20px)}
-  .section{margin:10px 0 4px;padding-top:8px;border-top:1px dashed var(--border);color:#cbd5e1;font-weight:700;text-transform:uppercase;letter-spacing:.6px;font-size:12px}
-  .row{display:grid;grid-template-columns:1.3fr .7fr .7fr;gap:10px;padding:6px 0;align-items:center}
-  .row label{color:#cbd5e1;font-size:13px}
-  .row input,.row select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:#0b1424;color:var(--text);outline:none;transition:border .15s, box-shadow .15s}
-  .row input:focus,.row select:focus{box-shadow:0 0 0 3px var(--ring);border-color:transparent}
+  .card:hover{
+    box-shadow: 0 6px 20px rgba(0,0,0,.60);
+  }
+  .card:before{content:"";position:absolute; inset:-1px;border-radius:var(--radius-xl);background: radial-gradient(600px 120px at 20% -40px, var(--ring), transparent 60%);pointer-events:none;opacity:.5}
+  .card h2{margin:0 0 var(--spacing-sm);font-size:clamp(16px,2.1vw,20px);color:var(--text-heading);font-weight:700}
+  .section{display:flex;align-items:center;gap:8px;margin:22px 0 10px;color:var(--treblle-white);font-weight:700;font-size:14px;letter-spacing:0;text-transform:none;line-height:1.2}
+  .section::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--treblle-electric-200);box-shadow:0 0 12px rgba(74,144,226,.45)}
+  .row{display:grid;grid-template-columns:1.3fr .7fr .7fr;gap:10px;padding:var(--spacing-sm) 0;align-items:center;margin-bottom:var(--spacing-lg)}
+  .row label{color:var(--treblle-element-300);font-weight:600;font-size:13px;letter-spacing:.2px;text-transform:none;margin-bottom:6px}
+  .row input,.row select{width:100%;min-height:42px;padding:11px 12px;border-radius:12px;border:1px solid var(--treblle-element-300);background:var(--surface-field);color:var(--treblle-fog);outline:none;transition:all .15s}
+  .row input::placeholder{color:var(--treblle-element-300)}
+  .row input:hover,.row select:hover{border-color:var(--treblle-element-200)}
+  .row input:focus,.row select:focus{box-shadow:0 0 0 3px var(--ring);border-color:var(--treblle-electric-200);background:var(--surface)}
+  .row input:invalid{border-color:var(--bad);box-shadow:0 0 0 1px var(--bad)}
+  .row input.error{border-color:var(--bad);box-shadow:0 0 0 2px rgba(239,68,68,.2)}
+  .row input.success{border-color:var(--good);box-shadow:0 0 0 2px rgba(22,199,132,.2)}
   .row input[type=number]{text-align:right}
   .hint{color:var(--muted);font-size:12px}
   .stack{display:flex;gap:10px;flex-wrap:wrap}
-  .btn{border:1px solid var(--border);background:#0b1424;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer}
-  .btn.primary{background:linear-gradient(180deg, var(--primary), var(--accent));color:#051320;font-weight:800;border:none}
+  .btn{border:1px solid var(--border);background:var(--treblle-obsidian);color:var(--treblle-fog);padding:10px 14px;border-radius:12px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+  .btn:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+  .btn:focus{outline:none;box-shadow:0 0 0 3px var(--treblle-electric-100)}
+  .btn.primary{background:var(--treblle-primary);color:var(--treblle-white);font-weight:800;border:none}
+  .btn.primary:hover{background:var(--treblle-electric-200);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,88,255,.3)}
+  .btn.primary:focus{box-shadow:0 0 0 3px var(--treblle-electric-100)}
+  .btn.primary:active{transform:translateY(1px);box-shadow:0 2px 8px rgba(0,88,255,.2)}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn.loading{cursor:not-allowed}
+  .btn.loading::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:16px;height:16px;border:2px solid transparent;border-top:2px solid currentColor;border-radius:50%;animation:spin 1s linear infinite}
+  @keyframes spin{0%{transform:translate(-50%,-50%) rotate(0deg)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
   .summary{display:grid;grid-template-columns: repeat(2, minmax(0,1fr));gap:14px}
-  .kpi{background:#091325;border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:2px}
+  .kpi{background:var(--treblle-obsidian);border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:2px}
   .kpi h3{margin:0;color:#cbd5e1;font-size:13px}
   .kpi .val{font-size:clamp(20px,3.3vw,30px);font-weight:900}
   .kpi .trend{font-size:12px;color:var(--muted)}
+  .kpi-subtext,.result-subtext,.kpi-caption,.currency-subtext{color:var(--text-secondary);font-size:clamp(13px,1.65vw,15px);line-height:1.35;letter-spacing:.1px;font-weight:500;opacity:1 !important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  .result-value,.kpi-value,.currency{text-align:right;font-variant-numeric:tabular-nums}
   .mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
   .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-  .badge{font-size:12px;padding:6px 8px;border-radius:999px;border:1px solid var(--border);background:#0a1322;color:#cfe6ff}
+  .badge{font-size:12px;padding:6px 8px;border-radius:999px;border:1px solid var(--border);background:var(--treblle-obsidian);color:var(--treblle-fog)}
   .impact{display:grid;grid-template-columns:1fr;gap:10px;margin-top:8px}
-  .impactCard{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;background:linear-gradient(180deg,rgba(135,207,255,.06),rgba(255,255,255,.02));border:1px solid var(--border);border-radius:16px;padding:12px 14px}
-  .icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(220px 90px at 120% -10%, rgba(90,200,250,.25), transparent 60%),#0a1422;border:1px solid var(--border)}
+  .impactCard{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;background:linear-gradient(180deg,rgba(135,207,255,.06),rgba(255,255,255,.02));border:1px solid var(--treblle-element-300);border-radius:16px;padding:12px 14px;transition: all 0.2s ease}
+  .impactCard:hover{background:linear-gradient(180deg,rgba(135,207,255,.1),rgba(255,255,255,.04));border-color:var(--treblle-element-200);transform:translateY(-1px)}
+  .icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(220px 90px at 120% -10%, rgba(90,200,250,.25), transparent 60%),#0a1422;border:1px solid var(--treblle-element-300)}
   .icon svg{width:24px;height:24px;opacity:.9}
-  .impTitle{font-weight:700}
-  .beforeAfter{font-size:12px;color:var(--muted)}
+  .impTitle{font-weight:700;color:var(--treblle-fog)}
+  .beforeAfter{font-size:14px;color:var(--text-secondary);opacity:1;font-weight:500;line-height:1.35;letter-spacing:.1px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
   .deltaPct{font-weight:900;color:var(--good);font-size:clamp(16px,2.4vw,22px);text-align:right}
-  .deltaMoney{font-size:12px;color:#9cc2ff;text-align:right}
+  .deltaMoney{font-size:14px;color:var(--text-secondary);text-align:right;font-weight:500;line-height:1.35;letter-spacing:.1px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
   .bar{position:relative;height:8px;background:#081122;border-radius:999px;overflow:hidden;margin-top:7px}
   .bar>span{position:absolute;inset:0 100% 0 0;background:linear-gradient(90deg, var(--primary), var(--accent))}
   .drivers{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:10px;margin-top:10px}
   @media (max-width:520px){.drivers{grid-template-columns:1fr}}
-  .driver{background:#091325;border:1px solid var(--border);border-radius:14px;padding:12px}
+  .driver{background:var(--treblle-obsidian);border:1px solid var(--border);border-radius:14px;padding:12px}
   .driver .name{color:#cbd5e1;font-size:12px;margin-bottom:4px}
   .driver .amt{font-weight:800}
   /* small disclaimer style */
   .disclaimer{margin-top:6px;color:var(--muted);font-size:12px}
+  
+  /* Footer */
+  footer{margin-top:calc(var(--spacing-xl) * 2);padding:var(--spacing-lg) 0;text-align:center;border-top:1px solid var(--treblle-element-200);color:var(--treblle-element-300);font-size:13px;font-weight:500}
+  footer a{color:var(--treblle-electric-200);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+  
+  /* ---- Left Inputs panel: high-contrast notes & placeholders ---- */
+  
+  .pane-inputs .field-note,
+  .pane-inputs small.field-note {
+    color: var(--text-fieldnote);
+    font-size: clamp(13px, 1.6vw, 15px);
+    line-height: 1.35;
+    letter-spacing: 0.1px;
+    font-weight: 500;
+    opacity: 1; /* ensure no prior rules fade it */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Placeholders like "Optional" inside inputs — readable, not washed out */
+  .pane-inputs input::placeholder,
+  .pane-inputs textarea::placeholder {
+    color: var(--text-fieldnote);
+    opacity: 1;
+    font-weight: 500;
+  }
+  
+  /* Keep rows tidy so notes don't feel cramped */
+  .pane-inputs .row { margin-bottom: 16px; }
+  
+  /* Larger logo */
+  .header-brand img { height: var(--brand-logo-size); display: block; }
+  .header-brand + .header-content { margin-top: 12px; }
+  
+  /* Error and Loading States */
+  .error-message{background:rgba(239,68,68,.1);border:1px solid var(--bad);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:13px;color:var(--bad);display:none}
+  .error-message.show{display:block}
+  .loading-state{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-top:8px}
+  .loading-state .spinner{width:16px;height:16px;border:2px solid var(--treblle-element-300);border-top:2px solid var(--treblle-electric-200);border-radius:50%;animation:spin 1s linear infinite}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
+  .empty-state svg{width:48px;height:48px;opacity:0.5;margin-bottom:16px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Treblle Enterprise: ROI Estimator</h1>
-    <p class="sub">Estimate your API time-savings, net value, ROI multiple, and payback - based on your inputs.</p>
-    <div class="disclaimer">This tool provides operational efficiency estimates only. Results depend on your inputs and model assumptions; actual outcomes may vary.</div>
+    <div class="header-brand">
+      <img src="treblle-logo.svg" alt="Treblle" />
+    </div>
+    <div class="header-content">
+      <h1>Treblle Enterprise: ROI Estimator</h1>
+      <p class="sub">Estimate your API time-savings, net value, ROI multiple, and payback - based on your inputs.</p>
+      <div class="disclaimer">This tool provides operational efficiency estimates only. Results depend on your inputs and model assumptions; actual outcomes may vary.</div>
+    </div>
   </header>
 
   <div class="grid">
-    <div class="card">
+    <div class="card pane-inputs">
       <h2>Inputs</h2>
       <div class="badges">
         <div class="badge">Conservative adjustment applied to benefits</div>
@@ -104,20 +263,20 @@
       </div>
 
       <div class="section">Company & Traffic</div>
-      <div class="row"><label>Company name</label><input id="company" placeholder="Optional" /><div></div></div>
-      <div class="row"><label>Annual API requests</label><input id="annualRequests" type="number" value="300000000" class="mono"/><div class="hint">For context only</div></div>
-      <div class="row"><label>Monthly API growth (%)</label><input id="monthlyGrowth" type="number" value="10" step="0.1" class="mono"/><div></div></div>
-      <div class="row"><label>Production APIs (count)</label><input id="numAPIs" type="number" value="25" min="1" step="1" class="mono"/><div class="hint">Base includes 25</div></div>
-      <div class="row"><label>API consumers / partners (count)</label><input id="numConsumers" type="number" value="1000" min="0" step="1" class="mono"/><div></div></div>
+      <div class="row"><label for="company">Company name</label><input id="company" placeholder="Optional" /><div></div></div>
+      <div class="row"><label for="annualRequests">Annual API requests</label><input id="annualRequests" type="number" value="300000000" class="mono"/><div class="hint"><small class="field-note">For context only</small></div></div>
+      <div class="row"><label for="monthlyGrowth">Monthly API growth (%)</label><input id="monthlyGrowth" type="number" value="10" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label for="numAPIs">Production APIs (count)</label><input id="numAPIs" type="number" value="25" min="1" step="1" class="mono"/><div class="hint"><small class="field-note">Base includes 25</small></div></div>
+      <div class="row"><label for="numConsumers">API consumers / partners (count)</label><input id="numConsumers" type="number" value="1000" min="0" step="1" class="mono"/><div></div></div>
 
       <div class="section">Support & Engineering Baseline</div>
-      <div class="row"><label>Support tickets per month (all)</label><input id="ticketsPerMonth" type="number" value="200" class="mono"/><div></div></div>
-      <div class="row"><label>% of tickets that are API-related</label><input id="pctApiTickets" type="number" value="70" step="0.1" class="mono"/><div></div></div>
-      <div class="row"><label>% of API tickets escalated to engineering</label><input id="pctEscalated" type="number" value="30" step="0.1" class="mono"/><div></div></div>
-      <div class="row"><label>Avg Support time per API ticket (hours)</label><input id="hrsSupportPerTicket" type="number" value="0.5" step="0.01" class="mono"/><div></div></div>
-      <div class="row"><label>Avg Engineering time per escalated ticket (hours)</label><input id="hrsEngPerEscalation" type="number" value="1.0" step="0.01" class="mono"/><div></div></div>
-      <div class="row"><label>Hourly loaded cost - Support ($)</label><input id="rateSupport" type="number" value="45" class="mono"/><div></div></div>
-      <div class="row"><label>Hourly loaded cost - Engineering ($)</label><input id="rateEng" type="number" value="85" class="mono"/><div></div></div>
+      <div class="row"><label for="ticketsPerMonth">Support tickets per month (all)</label><input id="ticketsPerMonth" type="number" value="200" class="mono"/><div></div></div>
+      <div class="row"><label for="pctApiTickets">% of tickets that are API-related</label><input id="pctApiTickets" type="number" value="70" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label for="pctEscalated">% of API tickets escalated to engineering</label><input id="pctEscalated" type="number" value="30" step="0.1" class="mono"/><div></div></div>
+      <div class="row"><label for="hrsSupportPerTicket">Avg Support time per API ticket (hours)</label><input id="hrsSupportPerTicket" type="number" value="0.5" step="0.01" class="mono"/><div></div></div>
+      <div class="row"><label for="hrsEngPerEscalation">Avg Engineering time per escalated ticket (hours)</label><input id="hrsEngPerEscalation" type="number" value="1.0" step="0.01" class="mono"/><div></div></div>
+      <div class="row"><label for="rateSupport">Hourly loaded cost - Support ($)</label><input id="rateSupport" type="number" value="45" class="mono"/><div></div></div>
+      <div class="row"><label for="rateEng">Hourly loaded cost - Engineering ($)</label><input id="rateEng" type="number" value="85" class="mono"/><div></div></div>
 
       <div class="section">Analysis & Governance</div>
       <div class="row"><label>Weekly hours on customer pattern analysis (team total)</label><input id="weeklyPatternHours" type="number" value="20" step="0.1" class="mono"/><div></div></div>
@@ -136,10 +295,10 @@
       <div class="row"><label>Developer portal license savings ($/year)</label><input id="devPortalSavings" type="number" value="0" class="mono"/><div></div></div>
 
       <div class="section">Assumptions & Deployment</div>
-      <div class="row"><label>Conservatism factor (%)</label><input id="confidence" type="number" value="80" step="1" class="mono"/><div class="hint">Applies a discount to benefits</div></div>
+      <div class="row"><label>Conservatism factor (%)</label><input id="confidence" type="number" value="80" step="1" class="mono"/><div class="hint"><small class="field-note">Applies a discount to benefits</small></div></div>
       <div class="row"><label>Deployment</label>
         <select id="deployment"><option value="SaaS" selected>SaaS</option><option value="Private">Private</option></select>
-        <div class="hint">Override value bypasses estimator</div>
+        <div class="hint"><small class="field-note">Override value bypasses estimator</small></div>
       </div>
       <div class="row"><label>Treblle annual cost (override)</label><input id="override" type="number" placeholder="Leave blank to auto-estimate" class="mono"/><div></div></div>
       <div class="row"><label>Customer communication per ticket (hours)</label><input id="commsHoursPerTicket" type="number" value="0.25" step="0.01" class="mono"/><div></div></div>
@@ -162,14 +321,14 @@
         <div class="row"><label>Gateway/SQL manual query time reduction (%)</label><input id="bmAzure" type="number" value="90.0" step="0.1" class="mono"/><div></div></div>
 
         <div class="section">Pricing (auto-estimate when override is blank)</div>
-        <div class="row"><label>SaaS base ($/yr)</label><input id="pSaaSBase" type="number" value="35988" class="mono"/><div class="hint">$2,999/mo</div></div>
-        <div class="row"><label>SaaS add-on pack 25 APIs (annual)</label><input id="pSaaS25" type="number" value="10800" class="mono"/><div class="hint">+1B req</div></div>
-        <div class="row"><label>Private Cloud base ($/yr)</label><input id="pPrivBase" type="number" value="71976" class="mono"/><div class="hint">$5,998/mo</div></div>
-        <div class="row"><label>Private Cloud per-API (beyond 25) ($/yr)</label><input id="pPrivPerAPI" type="number" value="360" class="mono"/><div class="hint">$30/API/mo</div></div>
+        <div class="row"><label>SaaS base ($/yr)</label><input id="pSaaSBase" type="number" value="35988" class="mono"/><div class="hint"><small class="field-note">$2,999/mo</small></div></div>
+        <div class="row"><label>SaaS add-on pack 25 APIs (annual)</label><input id="pSaaS25" type="number" value="10800" class="mono"/><div class="hint"><small class="field-note">+1B req</small></div></div>
+        <div class="row"><label>Private Cloud base ($/yr)</label><input id="pPrivBase" type="number" value="71976" class="mono"/><div class="hint"><small class="field-note">$5,998/mo</small></div></div>
+        <div class="row"><label>Private Cloud per-API (beyond 25) ($/yr)</label><input id="pPrivPerAPI" type="number" value="360" class="mono"/><div class="hint"><small class="field-note">$30/API/mo</small></div></div>
       </details>
     </div>
 
-    <div class="card">
+    <div class="card" aria-live="polite">
       <h2>Results</h2>
 
       <div class="summary">
@@ -209,6 +368,10 @@
       <div class="disclaimer">These outputs are estimates based on user-provided inputs and model assumptions.</div>
     </div>
   </div>
+  
+  <footer>
+    © 2025 Treblle — <a href="mailto:sales@treblle.com">sales@treblle.com</a>
+  </footer>
 </div>
 
 <script>
@@ -352,11 +515,11 @@
       {key:"pattern", title:"Weekly pattern-analysis effort", before:v.weeklyPatternHours, after:patternWeeklyAfter, unit:"hrs", savings:patternSavings}
     ];
     const iconsMap = {
-      support:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M6 8a6 6 0 1112 0v3a2 2 0 012 2v4a2 2 0 01-2 2h-2v-7h2V8a8 8 0 10-16 0v3h2v7H6a2 2 0 01-2-2v-4a2 2 0 012-2V8z'/></svg>`,
-      eng:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M9.75 6.75l4.5 4.5-4.5 4.5M4.5 6.75h5.25M14.25 17.25H19.5'/></svg>`,
-      comms:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M21 15a3 3 0 01-3 3H8l-5 3V6a3 3 0 013-3h12a3 3 0 013 3v9z'/></svg>`,
-      azure:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><circle cx='12' cy='12' r='8'/><path d='M12 6v6l3 3'/></svg>`,
-      pattern:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M4 17l6-6 4 4 6-6'/><path d='M16 5h4v4'/></svg>`
+      support:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' aria-hidden='true'><path d='M6 8a6 6 0 1112 0v3a2 2 0 012 2v4a2 2 0 01-2 2h-2v-7h2V8a8 8 0 10-16 0v3h2v7H6a2 2 0 01-2-2v-4a2 2 0 012-2V8z'/></svg>`,
+      eng:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' aria-hidden='true'><path d='M9.75 6.75l4.5 4.5-4.5 4.5M4.5 6.75h5.25M14.25 17.25H19.5'/></svg>`,
+      comms:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' aria-hidden='true'><path d='M21 15a3 3 0 01-3 3H8l-5 3V6a3 3 0 013-3h12a3 3 0 013 3v9z'/></svg>`,
+      azure:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' aria-hidden='true'><circle cx='12' cy='12' r='8'/><path d='M12 6v6l3 3'/></svg>`,
+      pattern:`<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' aria-hidden='true'><path d='M4 17l6-6 4 4 6-6'/><path d='M16 5h4v4'/></svg>`
     };
     const areasEl = $('areas'); areasEl.innerHTML = "";
     areas.forEach(a=>{
